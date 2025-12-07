@@ -110,9 +110,11 @@ private suspend fun ApplicationCall.handleCreateTaskError(
         val statusHtml = messageStatusFragment(validation.message, isError = true)
         respondTaskArea(paginated, statusHtml)
     } else {
-        response.headers.append("Location", redirectPath(query, 1))
-        respond(HttpStatusCode.SeeOther)
-    }
+    val html = renderTemplate("tasks/index.peb", mapOf(
+        "error" to "title",
+        "msg" to outcome
+    ))
+    respondText(html, ContentType.Text.Html)
 }
 
 private suspend fun ApplicationCall.handleCreateTaskSuccess(
@@ -292,7 +294,14 @@ private fun messageStatusFragment(
     val role = if (isError) "alert" else "status"
     val ariaLive = if (isError) """ aria-live="assertive"""" else """ aria-live="polite""""
     val cssClass = if (isError) """ class="error"""" else ""
-    return """<div id="status" hx-swap-oob="true" role="$role"$ariaLive$cssClass>$message</div>"""
+    return """
+    <div id="status" hx-swap-oob="true" role="$role"$ariaLive$cssClass tabindex="-1">
+        $message
+    </div>
+    <script>
+        document.getElementById('status')?.focus();
+    </script>
+    """.trimIndent()
 }
 
 /**
