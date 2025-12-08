@@ -110,11 +110,15 @@ private suspend fun ApplicationCall.handleCreateTaskError(
         val statusHtml = messageStatusFragment(validation.message, isError = true)
         respondTaskArea(paginated, statusHtml)
     } else {
-    val html = renderTemplate("tasks/index.peb", mapOf(
-        "error" to "title",
-        "msg" to outcome
-    ))
-    respondText(html, ContentType.Text.Html)
+        val html = renderTemplate(
+            "tasks/index.peb",
+            mapOf(
+                "error" to "title",
+                "msg" to outcome
+            )
+        )
+        respondText(html, ContentType.Text.Html)
+    }
 }
 
 private suspend fun ApplicationCall.handleCreateTaskSuccess(
